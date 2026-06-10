@@ -38,15 +38,16 @@ env/
 # ──────────────────────────────────────────────
 # Generated Data (downloaded at runtime)
 # ──────────────────────────────────────────────
-data/nvd/
+data/nvd/*
 data/cve_database.sqlite
+!data/nvd/.gitkeep
+!data/rules/.gitkeep
 
 # ──────────────────────────────────────────────
 # Reports (generated per scan)
 # ──────────────────────────────────────────────
-reports/*.json
-reports/*.html
-reports/*.pdf
+reports/*
+!reports/.gitkeep
 
 # ──────────────────────────────────────────────
 # Environment & Secrets
