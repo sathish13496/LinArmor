@@ -2332,15 +2332,17 @@
             if (el) el.classList.add('active');
 
             // Dedicated full-page views: hide dashboard, show only that section
-            const mainSections = document.querySelectorAll('.main-content > section, .main-content > .scan-control, .main-content > div:not(#scan-type-desc)');
+            const mainSections = document.querySelectorAll('.main-content > section, .main-content > .scan-control');
+            const scanTypeDesc = document.getElementById('scan-type-desc');
             const timelineSec = document.getElementById('section-timeline');
             const auditSec = document.getElementById('section-audit');
 
             if (dedicatedViews.includes(view)) {
-                // Hide all dashboard sections
+                // Hide all dashboard sections + scan type banner
                 mainSections.forEach(s => {
                     if (s.id !== 'section-timeline' && s.id !== 'section-audit') s.style.display = 'none';
                 });
+                if (scanTypeDesc) scanTypeDesc.style.display = 'none';
                 // Show only the target section
                 if (view === 'timeline') { timelineSec.style.display = ''; auditSec.style.display = 'none'; }
                 if (view === 'logs') { auditSec.style.display = ''; timelineSec.style.display = 'none'; }
@@ -2353,6 +2355,7 @@
                 else if (s.id === 'section-ports' && !document.querySelector('#ports-tbody tr td strong')) s.style.display = 'none';
                 else s.style.display = '';
             });
+            if (scanTypeDesc) scanTypeDesc.style.display = '';
 
             // Scroll to specific section
             const sectionMap = {
@@ -2640,7 +2643,7 @@
             try {
                 const res = await fetch('/api/findings');
                 const data = await res.json();
-                renderFindings(data.findings || []);
+                renderFindings(data.findings || [], true);
                 if (data.severity_counts) {
                     document.getElementById('count-critical').textContent = data.severity_counts.critical || 0;
                     document.getElementById('count-high').textContent = data.severity_counts.high || 0;
@@ -2658,8 +2661,8 @@
 
         let allFindings = [];
 
-        function renderFindings(findings) {
-            allFindings = findings;
+        function renderFindings(findings, isFromFetch) {
+            if (isFromFetch) allFindings = findings;
             const tbody = document.getElementById('findings-tbody');
             if (!findings.length) {
                 tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:40px;color:var(--text-muted);">' +
@@ -2992,7 +2995,7 @@
                     const url = sev === 'all' ? '/api/findings' : '/api/findings?severity=' + sev;
                     const res = await fetch(url);
                     const data = await res.json();
-                    renderFindings(data.findings || []);
+                    renderFindings(data.findings || [], true);
                 } catch (e) { /* no scan data yet */ }
             });
         });
